@@ -45,6 +45,7 @@ try:
         server.starttls()
         server.login(login,password)
         server.sendmail(sender_email,receiver_email,message.as_string())
+
 except smtplib.SMTPAuthenticationError:
     print("Most probably the server didn’t accept the username/password combination provided.")   
 except smtplib.SMTPRecipientsRefused:
@@ -54,4 +55,5 @@ except smtplib.SMTPResponseException as e:
 except Exception:
     print("Something wrong! Plz try again later")
 
-print("Email was sent successfully")
+else:
+    print("Email was sent successfully")
