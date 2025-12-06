@@ -1,13 +1,15 @@
 import smtplib
 import os
+
 from dotenv import load_dotenv
+
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
 
 host = os.getenv('host_name')
-port = os.getenv('port_value', 587)
+port = 587
 
 login = os.getenv('login_email')
 password = os.getenv('password')
@@ -15,26 +17,29 @@ password = os.getenv('password')
 sender_email = os.getenv('sender_email')
 receiver_email = os.getenv('receiver_email')
 
-text = "Why is it so difficult"
+email_body_plain = "Write something inside"
 
 message = MIMEMultipart('alternative')
 message["From"] = sender_email
 message["To"] = receiver_email
-message["Subject"] = "Welcome to Mailtrap"
+message["Subject"] = "Subject of the Email"
 
 
-html_content = """\
+email_body_html = """\
 <html>
     <body>
-        <h1>FRIDGE ME Welcome to Mailtrap</h1>
-        <p>Why is it so difficult</p>
-        <h2>Heck me</h2>
+        <h1>Heading1</h1>
+        <p>Lorem Ipsum</p>
+        <h2>Heading2</h2>
+        <p>Lorem Ipsum Lorem Ipsum</p>
     </body>
 <html>
     """
 
-message.attach(MIMEText((text), "plain"))
-message.attach(MIMEText(html_content, "html"))
+message.attach(MIMEText(email_body_plain, "plain"))
+message.attach(MIMEText(email_body_html, "html"))
+
+
 try:
     with smtplib.SMTP(host,port) as server:
         server.starttls()
@@ -49,4 +54,4 @@ except smtplib.SMTPResponseException as e:
 except Exception:
     print("Something wrong! Plz try again later")
 
-print("Done")
+print("Email was sent successfully")
