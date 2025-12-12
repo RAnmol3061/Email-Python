@@ -1,6 +1,8 @@
 import smtplib, os
+import tkinter as tk
 
 from dotenv import load_dotenv
+from tkinter import filedialog
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -58,9 +60,24 @@ def email(plain_text, html_text, attachment_file):
 
     return mail
 
-file_path_attachment = Path("C.pdf")
-text = Path("text.txt")
-html = Path("html.txt")
+def open_filedialog():
+    root = tk.Tk()
+    root.withdraw()
+
+    filepath = filedialog.askopenfilename(
+        title = 'Select a file to upload',
+        initialdir = os.getcwd(),
+        filetypes = [("All files","*.*"),("PDF files","*.pdf*"),("Text file","*.txt*")]
+    )
+
+    if filepath:
+        return filepath
+    else:
+        return(None)
+
+file_path_attachment = Path(open_filedialog())
+text = Path(open_filedialog())
+html = Path(open_filedialog())
 
 
 def connection(login,password):
@@ -86,4 +103,3 @@ def connection(login,password):
         print("Email was sent successfully")
 
 connection(os.getenv('login_email'),os.getenv('password'))
-
