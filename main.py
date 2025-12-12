@@ -16,9 +16,24 @@ def read_file(file_path):
             return file
     except FileNotFoundError as e:
         print(f"Error: {e}")
-        print("Program Exiting --x--")
-        sys.exit()
-
+        raise e
+def read_file_text(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            file = f.read()
+            return file
+    except FileNotFoundError as e:
+        print(f'Error: {e}')
+        raise e
+def read_file_html(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            file = f.read()
+            return file
+    except FileNotFoundError as e:
+        print(f'Error: {e}')
+        raise e
+ 
 def email(plain_text, html_text, attachment_file, sender_email, receiver_email):
     
     mail = MIMEMultipart('mixed')
@@ -56,17 +71,8 @@ p = Path(file_path)
 
 
 
-text = "Write something inside"
-html = """\
-    <html>
-        <body>
-            <h1>Heading1</h1>
-            <p>Lorem Ipsum</p>
-            <h2>Heading2</h2>
-            <p>Lorem Ipsum Lorem Ipsum</p>
-        </body>
-    </html>
-        """
+text = Path("text.txt")
+html = Path("html.txt")
 
 
 
@@ -74,7 +80,7 @@ try:
     with smtplib.SMTP(host,port) as server:
         server.starttls()
         server.login(login,password)
-        server.sendmail(sender_email,receiver_email,email(text,html,p,sender_email,receiver_email).as_string())
+        server.sendmail(sender_email,receiver_email,email(read_file_text(text),read_file_html(html),p,sender_email,receiver_email).as_string())
 
 except smtplib.SMTPAuthenticationError:
     print("Most probably the server didn’t accept the username/password combination provided.")   
