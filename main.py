@@ -1,4 +1,4 @@
-import smtplib, sys, os
+import smtplib, os
 
 from dotenv import load_dotenv
 
@@ -33,8 +33,11 @@ def read_file_html(file_path):
     except FileNotFoundError as e:
         print(f'Error: {e}')
         raise e
- 
-def email(plain_text, html_text, attachment_file, sender_email, receiver_email):
+
+sender_email = os.getenv('sender_email')
+receiver_email = os.getenv('receiver_email')
+
+def email(plain_text, html_text, attachment_file):
     
     mail = MIMEMultipart('mixed')
     mail["From"] = sender_email
@@ -42,11 +45,9 @@ def email(plain_text, html_text, attachment_file, sender_email, receiver_email):
     mail["Subject"] = "Subject of the Email"
 
     body = MIMEMultipart('alternative')
-    email_body_plain = plain_text
-    email_body_html = html_text
 
-    body.attach(MIMEText(email_body_plain, "plain"))
-    body.attach(MIMEText(email_body_html, "html"))
+    body.attach(MIMEText(plain_text, "plain"))
+    body.attach(MIMEText(html_text, "html"))
 
     attachment = MIMEApplication(read_file(attachment_file), _subtype='pdf')
     attachment.add_header('Content-Disposition','attachment',filename = attachment_file.name)
@@ -57,42 +58,32 @@ def email(plain_text, html_text, attachment_file, sender_email, receiver_email):
 
     return mail
 
-host = os.getenv('host_name')
-port = 587
-
-login = os.getenv('login_email')
-password = os.getenv('password')
-
-sender_email = os.getenv('sender_email')
-receiver_email = os.getenv('receiver_email')
-
-file_path = "C.pdf"
-p = Path(file_path)
-
-
-
+file_path_attachment = Path("C.pdf")
 text = Path("text.txt")
 html = Path("html.txt")
 
 
+def connection(login,password):
+    host = os.getenv('host_name')
+    port = 587
 
-try:
-    with smtplib.SMTP(host,port) as server:
-        server.starttls()
-        server.login(login,password)
-        server.sendmail(sender_email,receiver_email,email(read_file_text(text),read_file_html(html),p,sender_email,receiver_email).as_string())
+    try:
+        with smtplib.SMTP(host,port) as server:
+            server.starttls()
+            server.login(login,password)
+            server.sendmail(sender_email,receiver_email,email(read_file_text(text),read_file_html(html),file_path_attachment).as_string())
 
-except smtplib.SMTPAuthenticationError:
-    print("Most probably the server didn’t accept the username/password combination provided.")   
-except smtplib.SMTPRecipientsRefused:
-    print(f"Recipient Refused: {smtplib.SMTP.sendmail()} ")
-except smtplib.SMTPResponseException as e:
-    print(f"{e.smtp_code}: {e.smtp_error}")
-except Exception:
-    print("Something wrong! Plz try again later")
+    except smtplib.SMTPAuthenticationError:
+        print("Most probably the server didn’t accept the username/password combination provided.")   
+    except smtplib.SMTPRecipientsRefused:
+        print(f"Recipient Refused: {smtplib.SMTP.sendmail()} ")
+    except smtplib.SMTPResponseException as e:
+        print(f"{e.smtp_code}: {e.smtp_error}")
+    except Exception:
+        print("Something wrong! Plz try again later")
 
-else:
-    print("Email was sent successfully")
+    else:
+        print("Email was sent successfully")
 
-
+connection(os.getenv('login_email'),os.getenv('password'))
 
